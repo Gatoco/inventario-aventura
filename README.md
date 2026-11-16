@@ -2,6 +2,8 @@
 
 Django + MySQL (PyMySQL) + SB Admin 2. Apps: `core`, `cuentas`, `experiencias`.
 
+Repositorio: <https://github.com/Gatoco/inventario-aventura>
+
 ## Credenciales de prueba (clave de todos: `Aventura2026!`)
 | Rol | Usuario |
 |---|---|
