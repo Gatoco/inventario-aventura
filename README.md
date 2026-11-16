@@ -1,75 +1,67 @@
-# inventarioAventura — Ecoparque «Aventuras del Sur»
+# inventarioAventura
 
-Sistema de administración y reservas de experiencias al aire libre, hecho en Django
-con MySQL. Permite gestionar el catálogo de actividades, las inscripciones de los
-visitantes y el acceso según el rol de cada usuario.
+Sistema de administración y reservas para el ecoparque "Aventuras del Sur", hecho en
+Django con MySQL para el ramo de Programación Back End.
 
-**Repositorio:** https://github.com/Gatoco/inventario-aventura
+Maneja el catálogo de experiencias (trekking, canopy, kayak, arriendo de equipos), las
+inscripciones de los turistas y el acceso según el rol de cada uno.
 
-## Qué hay que instalar
+El repositorio está en https://github.com/Gatoco/inventario-aventura
 
-```
-Django>=5.2,<5.3
-PyMySQL>=1.1
-```
+## Instalación
 
-## Cómo levantarlo
+Hace falta Django 5.2 y PyMySQL, los dos están en requirements.txt:
 
-```bash
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
+    python -m venv venv
+    source venv/bin/activate
+    pip install -r requirements.txt
 
-# La base de datos tiene que estar corriendo en localhost:3306
-mysql -u root < backup_inventarioAventura.sql
+Después hay que tener MySQL o MariaDB corriendo en localhost:3306 y cargar el respaldo:
 
-python manage.py runserver
-```
+    mysql -u root < backup_inventarioAventura.sql
 
-Si prefieres no usar el respaldo `.sql`, crea la base `inventario_aventura_db` a mano
-y después corre:
+Si prefieres partir de cero, crea la base inventario_aventura_db a mano y corre:
 
-```bash
-python manage.py migrate
-python manage.py seed_demo
-```
+    python manage.py migrate
+    python manage.py seed_demo
 
-## Credenciales de prueba
+Ese comando deja los usuarios y los datos de prueba listos, y se puede correr las veces
+que quieras sin que se duplique nada.
 
-La clave es la misma para todos: `Aventura2026!`
+Para levantar el sitio:
 
-| Rol | Usuario | Qué puede hacer |
-|---|---|---|
-| Administrador | `admin` | Todo: usuarios, categorías, experiencias y todas las reservas |
-| Guía / Operador | `guia1` | Solo sus 4 experiencias. Puede crear, ver y editar. No elimina |
-| Guía / Operador | `guia2` | Solo sus 4 experiencias. Mismo alcance |
-| Turista | `turista1` | Ve el catálogo activo y tiene 3 inscripciones |
-| Turista | `turista2` | Ve el catálogo activo y tiene 3 inscripciones |
+    python manage.py runserver
 
-## Estructura
+## Usuarios de prueba
 
-El proyecto principal es `inventarioAventura`. Adentro hay tres apps:
+La clave es la misma para todos, Aventura2026!
 
-- `core` — la landing pública y las vistas generales
-- `cuentas` — usuarios, perfiles con rol, autenticación y sesiones
-- `experiencias` — categorías, experiencias, inscripciones y el comando `seed_demo`
+- admin es el administrador, el único que entra a usuarios y categorías
+- guia1 y guia2 son guías, cada uno tiene sus 4 experiencias y solo ve esas
+- turista1 y turista2 son turistas, cada uno con 3 reservas hechas
 
-Los modelos son cuatro: `Perfil` (extiende el User de Django con el rol),
-`Categoria`, `Experiencia` e `Inscripcion`. Todos están registrados en el admin y las
-migraciones están incluidas en el repositorio.
+## Cómo está armado
 
-## Un par de detalles de comportamiento
+El proyecto se llama inventarioAventura y adentro hay tres apps. core tiene la landing
+pública y las vistas generales. cuentas se encarga de los usuarios, los perfiles con rol
+y las sesiones. experiencias tiene las categorías, las experiencias, las inscripciones y
+el comando seed_demo.
 
-Las categorías solo las maneja el administrador. Si se intenta borrar una que todavía
-tiene experiencias asociadas, el sistema lo impide y avisa.
+Los modelos son Perfil, que extiende el User de Django con el rol, Categoria, Experiencia
+e Inscripcion. Todos están registrados en el admin y las migraciones van incluidas en el
+repositorio.
 
-Un guía que escribe a mano la URL de una experiencia que no es suya recibe un 404,
-porque el queryset está filtrado por `creador=request.user`.
+## Un par de cosas que hace
 
-Un administrador tampoco puede eliminarse a sí mismo.
+Las categorías las maneja solo el administrador. Si intenta borrar una que todavía tiene
+experiencias asociadas, el sistema no lo deja y le avisa.
+
+Si un guía escribe a mano la URL de una experiencia que no es suya, le sale un 404,
+porque el queryset está filtrado por creador=request.user.
+
+Un administrador tampoco se puede eliminar a sí mismo, y la fecha de una experiencia
+tiene que ser futura para poder guardarla.
 
 ## Pruebas
 
-```bash
-python manage.py test
-```
+    python manage.py test
