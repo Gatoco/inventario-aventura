@@ -1,24 +1,75 @@
 # inventarioAventura — Ecoparque «Aventuras del Sur»
 
-Django + MySQL (PyMySQL) + SB Admin 2. Apps: `core`, `cuentas`, `experiencias`.
+Sistema de administración y reservas de experiencias al aire libre, hecho en Django
+con MySQL. Permite gestionar el catálogo de actividades, las inscripciones de los
+visitantes y el acceso según el rol de cada usuario.
 
-Repositorio: <https://github.com/Gatoco/inventario-aventura>
+**Repositorio:** https://github.com/Gatoco/inventario-aventura
 
-## Credenciales de prueba (clave de todos: `Aventura2026!`)
-| Rol | Usuario |
-|---|---|
-| Administrador | `admin` |
-| Guía / Operador | `guia1`, `guia2` (4 experiencias c/u) |
-| Turista | `turista1`, `turista2` (3 inscripciones c/u) |
+## Qué hay que instalar
 
-## Arranque
+```
+Django>=5.2,<5.3
+PyMySQL>=1.1
+```
+
+## Cómo levantarlo
+
 ```bash
-python -m venv venv && source venv/bin/activate
+python -m venv venv
+source venv/bin/activate
 pip install -r requirements.txt
-# MySQL/MariaDB en localhost:3306, usuario root sin clave (ver settings.py)
-mysql -uroot < backup_inventarioAventura.sql      # restaura BD con datos
+
+# La base de datos tiene que estar corriendo en localhost:3306
+mysql -u root < backup_inventarioAventura.sql
+
 python manage.py runserver
 ```
-Alternativa sin el `.sql`: crear la BD `inventario_aventura_db`, luego `python manage.py migrate && python manage.py seed_demo`.
 
-Pruebas: `python manage.py test`.
+Si prefieres no usar el respaldo `.sql`, crea la base `inventario_aventura_db` a mano
+y después corre:
+
+```bash
+python manage.py migrate
+python manage.py seed_demo
+```
+
+## Credenciales de prueba
+
+La clave es la misma para todos: `Aventura2026!`
+
+| Rol | Usuario | Qué puede hacer |
+|---|---|---|
+| Administrador | `admin` | Todo: usuarios, categorías, experiencias y todas las reservas |
+| Guía / Operador | `guia1` | Solo sus 4 experiencias. Puede crear, ver y editar. No elimina |
+| Guía / Operador | `guia2` | Solo sus 4 experiencias. Mismo alcance |
+| Turista | `turista1` | Ve el catálogo activo y tiene 3 inscripciones |
+| Turista | `turista2` | Ve el catálogo activo y tiene 3 inscripciones |
+
+## Estructura
+
+El proyecto principal es `inventarioAventura`. Adentro hay tres apps:
+
+- `core` — la landing pública y las vistas generales
+- `cuentas` — usuarios, perfiles con rol, autenticación y sesiones
+- `experiencias` — categorías, experiencias, inscripciones y el comando `seed_demo`
+
+Los modelos son cuatro: `Perfil` (extiende el User de Django con el rol),
+`Categoria`, `Experiencia` e `Inscripcion`. Todos están registrados en el admin y las
+migraciones están incluidas en el repositorio.
+
+## Un par de detalles de comportamiento
+
+Las categorías solo las maneja el administrador. Si se intenta borrar una que todavía
+tiene experiencias asociadas, el sistema lo impide y avisa.
+
+Un guía que escribe a mano la URL de una experiencia que no es suya recibe un 404,
+porque el queryset está filtrado por `creador=request.user`.
+
+Un administrador tampoco puede eliminarse a sí mismo.
+
+## Pruebas
+
+```bash
+python manage.py test
+```
