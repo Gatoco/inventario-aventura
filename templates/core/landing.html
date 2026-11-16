@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Aventuras del Sur · Ecoparque y Reserva Natural</title>
+    <link href="{% static 'vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/sb-admin-2.min.css' %}" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+<nav class="navbar navbar-dark bg-gradient-success shadow">
+    <a class="navbar-brand" href="{% url 'home' %}"><i class="fas fa-mountain"></i> Aventuras del Sur</a>
+    <div>
+        {% if user.is_authenticated %}
+        <a href="{% url 'dashboard' %}" class="btn btn-light btn-sm">Ir al panel</a>
+        {% else %}
+        <a href="{% url 'login' %}" class="btn btn-light btn-sm">Ingresar</a>
+        <a href="{% url 'signup' %}" class="btn btn-outline-light btn-sm">Registrarse</a>
+        {% endif %}
+    </div>
+</nav>
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="text-gray-900">Ecoparque y Reserva Natural «Aventuras del Sur»</h1>
+        <p class="lead text-gray-700">Trekking, canopy, kayak y arriendo de equipos. Reserva tu próxima experiencia al aire libre.</p>
+    </div>
+    <div class="row">
+        {% for e in experiencias %}
+        <div class="col-md-4 mb-4">
+            <div class="card shadow h-100"><div class="card-body">
+                <span class="badge badge-success mb-2">{{ e.categoria.nombre }}</span>
+                <h5 class="card-title">{{ e.titulo }}</h5>
+                <p class="card-text text-gray-700">{{ e.descripcion|truncatechars:90 }}</p>
+                <p class="mb-0 small">{{ e.fecha_hora|date:"d/m/Y H:i" }} · ${{ e.precio }} · {{ e.cupos_disponibles }} cupos</p>
+            </div></div>
+        </div>
+        {% empty %}
+        <p class="text-center text-gray-600">Pronto publicaremos nuevas experiencias.</p>
+        {% endfor %}
+    </div>
+</div>
+</body>
+</html>

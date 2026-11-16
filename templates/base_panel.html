@@ -1,0 +1,76 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{% block title %}Aventuras del Sur{% endblock %}</title>
+    <link href="{% static 'vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/sb-admin-2.min.css' %}" rel="stylesheet">
+    <link href="{% static 'vendor/datatables/dataTables.bootstrap4.min.css' %}" rel="stylesheet">
+</head>
+<body id="page-top">
+<div id="wrapper">
+    <ul class="navbar-nav bg-gradient-success sidebar sidebar-dark accordion" id="accordionSidebar">
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{% url 'home' %}">
+            <div class="sidebar-brand-icon"><i class="fas fa-mountain"></i></div>
+            <div class="sidebar-brand-text mx-3">Aventuras del Sur</div>
+        </a>
+        <hr class="sidebar-divider my-0">
+        <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}"><i class="fas fa-fw fa-tachometer-alt"></i><span>Panel</span></a></li>
+        <hr class="sidebar-divider">
+        {% with rol=user.perfil.rol %}
+        {% if rol == 'admin' %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'lista_usuarios' %}"><i class="fas fa-fw fa-users"></i><span>Usuarios y guías</span></a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'lista_categorias' %}"><i class="fas fa-fw fa-tags"></i><span>Categorías</span></a></li>
+        {% endif %}
+        {% if rol == 'admin' or rol == 'guia' %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'lista_experiencias' %}"><i class="fas fa-fw fa-hiking"></i><span>Experiencias</span></a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'reservas' %}"><i class="fas fa-fw fa-clipboard-list"></i><span>{% if rol == 'admin' %}Reservas{% else %}Inscritos{% endif %}</span></a></li>
+        {% endif %}
+        {% if rol == 'turista' %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'catalogo' %}"><i class="fas fa-fw fa-compass"></i><span>Catálogo</span></a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'mis_reservas' %}"><i class="fas fa-fw fa-ticket-alt"></i><span>Mis reservas</span></a></li>
+        {% endif %}
+        {% endwith %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'mi_perfil' %}"><i class="fas fa-fw fa-user"></i><span>Mi perfil</span></a></li>
+    </ul>
+    <div id="content-wrapper" class="d-flex flex-column">
+        <div id="content">
+            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                <ul class="navbar-nav ml-auto align-items-center">
+                    <li class="nav-item mr-3 text-gray-600 small">{{ user.username }} · {{ user.perfil.get_rol_display }}</li>
+                    <li class="nav-item">
+                        <form action="{% url 'logout' %}" method="post" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</button>
+                        </form>
+                    </li>
+                </ul>
+            </nav>
+            <div class="container-fluid">
+                {% for m in messages %}
+                <div class="alert alert-{% if m.tags == 'error' %}danger{% else %}{{ m.tags }}{% endif %}">{{ m }}</div>
+                {% endfor %}
+                {% block contenido %}{% endblock %}
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+<script src="{% static 'js/sb-admin-2.min.js' %}"></script>
+<script src="{% static 'vendor/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'vendor/datatables/dataTables.bootstrap4.min.js' %}"></script>
+<script>
+$('.datatable').DataTable({
+    language: {
+        search: 'Buscar:', lengthMenu: 'Mostrar _MENU_ registros', zeroRecords: 'Sin resultados',
+        info: 'Mostrando _START_ a _END_ de _TOTAL_', infoEmpty: 'Sin registros',
+        infoFiltered: '(filtrado de _MAX_)', paginate: {first: 'Primero', last: 'Último', next: 'Siguiente', previous: 'Anterior'}
+    }
+});
+</script>
+</body>
+</html>

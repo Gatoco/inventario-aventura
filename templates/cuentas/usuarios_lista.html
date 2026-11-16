@@ -1,0 +1,30 @@
+{% extends 'base_panel.html' %}
+{% block contenido %}
+<div class="d-flex justify-content-between mb-3">
+    <h1 class="h3 text-gray-800">Usuarios y guías</h1>
+    <a href="{% url 'crear_usuario' %}" class="btn btn-success"><i class="fas fa-plus"></i> Nuevo usuario</a>
+</div>
+<div class="card shadow mb-4"><div class="card-body table-responsive">
+<table class="table table-bordered datatable" width="100%">
+    <thead><tr><th>Usuario</th><th>Nombre</th><th>Email</th><th>Rol</th><th>Activo</th><th>Acciones</th></tr></thead>
+    <tbody>
+    {% for u in usuarios %}
+    <tr>
+        <td>{{ u.username }}</td><td>{{ u.get_full_name }}</td><td>{{ u.email }}</td>
+        <td>{{ u.perfil.get_rol_display }}</td><td>{{ u.is_active|yesno:"Sí,No" }}</td>
+        <td>
+            <a href="{% url 'editar_usuario' u.id %}" class="btn btn-sm btn-primary">Editar</a>
+            <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#modalEliminar{{ u.id }}">Eliminar</button>
+            <div class="modal fade" id="modalEliminar{{ u.id }}" tabindex="-1"><div class="modal-dialog"><div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title">Confirmar eliminación</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button></div>
+                <div class="modal-body">¿Seguro que desea eliminar a <strong>{{ u.username }}</strong>?</div>
+                <div class="modal-footer"><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <form method="post" action="{% url 'eliminar_usuario' u.id %}" class="d-inline">{% csrf_token %}<button type="submit" class="btn btn-danger">Eliminar</button></form></div>
+            </div></div></div>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table></div></div>
+{% endblock %}

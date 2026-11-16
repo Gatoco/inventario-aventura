@@ -1,0 +1,29 @@
+{% extends 'base_panel.html' %}
+{% block contenido %}
+<div class="d-flex justify-content-between mb-3">
+    <h1 class="h3 text-gray-800">Categorías</h1>
+    <a href="{% url 'crear_categoria' %}" class="btn btn-success"><i class="fas fa-plus"></i> Nueva categoría</a>
+</div>
+<div class="card shadow mb-4"><div class="card-body table-responsive">
+<table class="table table-bordered datatable" width="100%">
+    <thead><tr><th>Nombre</th><th>Descripción</th><th>Estado</th><th>Acciones</th></tr></thead>
+    <tbody>
+    {% for c in categorias %}
+    <tr>
+        <td>{{ c.nombre }}</td><td>{{ c.descripcion }}</td><td>{{ c.estado|yesno:"Activo,Inactivo" }}</td>
+        <td>
+            <a href="{% url 'editar_categoria' c.id %}" class="btn btn-sm btn-primary">Editar</a>
+            <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#modalEliminar{{ c.id }}">Eliminar</button>
+            <div class="modal fade" id="modalEliminar{{ c.id }}" tabindex="-1"><div class="modal-dialog"><div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title">Confirmar eliminación</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button></div>
+                <div class="modal-body">¿Seguro que desea eliminar la categoría <strong>{{ c.nombre }}</strong>?</div>
+                <div class="modal-footer"><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <form method="post" action="{% url 'eliminar_categoria' c.id %}" class="d-inline">{% csrf_token %}<button type="submit" class="btn btn-danger">Eliminar</button></form></div>
+            </div></div></div>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table></div></div>
+{% endblock %}
